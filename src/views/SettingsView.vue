@@ -1,6 +1,6 @@
 <template>
-  <div class="about">
-    <h1>This is the about page</h1>
+  <div class="settings">
+    <h1>This is the settings page</h1>
   </div>
 </template>
 
@@ -8,7 +8,7 @@
 import Vue from 'vue'
 
 export default Vue.extend({
-  name: 'AboutView',
+  name: 'SettingsView',
 
   components: {}
 })
