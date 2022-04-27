@@ -1,5 +1,8 @@
 <template>
-  <v-card hover>
+  <v-card
+    :loading="cardLoading"
+    hover
+  >
     <validation-observer
       ref="observer"
       v-slot="{ invalid }"
@@ -7,6 +10,7 @@
       <v-form
         v-if="!isAuth"
         id="login"
+        :disabled="disabled"
         @submit.prevent="submitForm"
       >
         <v-container>
@@ -73,6 +77,7 @@
 import Vue from 'vue'
 import { extend, setInteractionMode, ValidationObserver, ValidationProvider } from 'vee-validate'
 import { required } from 'vee-validate/dist/rules'
+import { mapActions, mapGetters } from 'vuex'
 
 setInteractionMode('aggressive')
 
@@ -96,26 +101,37 @@ export default Vue.extend({
         password: ''
       },
       loading: false,
-      isAuth: false,
-      token: ''
+      disabled: false,
+      cardLoading: false
     }
   },
 
-  methods: {
-    submitForm () {
-      this.loading = true
+  computed: {
+    ...mapGetters({ isAuth: 'isAuthenticated' })
+  },
 
-      //  Put server connection, authentication and everything else here
-      // The code below is just a placeholder for a simulated login and server connection
-      setTimeout(() => {
-        this.loading = false
-        this.isAuth = true
-      }, 100)
+  methods: {
+    ...mapActions(['Login', 'Logout']),
+    async submitForm () {
+      this.loading = true
+      try {
+        await this.Login(this.user)
+      } catch (error) {
+
+      }
     },
 
     logout () {
-      // Put cleanup codes here then reload the page
+      this.clearForm()
+      this.disabled = true
+      this.cardLoading = true
+      this.Logout()
       this.$router.go(0)
+    },
+
+    clearForm () {
+      this.user.username = ''
+      this.user.password = ''
     }
   }
 })
