@@ -16,12 +16,12 @@ const state = getDefaultState()
 
 const getters = {
   isAuthenticated: (state: any) => state.user.id > 0,
-  getUserState: (state: any) => state.user
+  getUserState: (state: any) => state.user,
+  getToken: (state: any) => state.user.token
 }
 
 const actions = {
   async Login ({ commit }: { commit: Commit }, form: any) {
-    console.log(form)
     let user = null
     await axios.post('concerto/login', form).then((result) => {
       user = result.data
@@ -35,12 +35,12 @@ const actions = {
 }
 
 const mutations = {
-  setUser (state: any, user: any) {
-    state.user = user
-  },
-
   resetState (state: any) {
     Object.assign(state, getDefaultState())
+  },
+
+  setUser (state: any, user: any) {
+    state.user = user
   }
 }
 

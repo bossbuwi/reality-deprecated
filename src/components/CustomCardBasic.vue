@@ -2,6 +2,7 @@
 
     <v-card
       hover
+      :loading="loading"
     >
       <v-card-title>
         <v-row>
@@ -43,7 +44,11 @@
       </v-divider>
 
       <v-card-actions>
-        <v-btn text class="text-capitalize">
+        <v-btn
+          text
+          class="text-capitalize"
+          @click="refreshData"
+        >
           <v-icon right>
              mdi-refresh
           </v-icon>
@@ -60,7 +65,10 @@ export default Vue.extend({
   name: 'CustomCardBasic',
 
   props: [
-    'cardIcon', 'cardName', 'cardContent'
+    'cardIcon',
+    'cardName',
+    'cardContent',
+    'loading'
   ],
 
   data () {
@@ -70,7 +78,9 @@ export default Vue.extend({
   },
 
   methods: {
-
+    refreshData () {
+      this.$emit('refresh-data')
+    }
   }
 })
 </script>
