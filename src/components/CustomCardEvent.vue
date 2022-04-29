@@ -1,6 +1,7 @@
 <template>
     <v-card
       hover
+      :loading="loading"
     >
       <v-card-title>
         <v-row>
@@ -22,8 +23,25 @@
           </v-col>
         </v-row>
       </v-card-title>
-
+      <v-row
+        v-if="!shown"
+        justify="center"
+      >
+        <v-col
+          cols="2"
+        >
+          <v-divider
+            class="mx-8"
+          ></v-divider>
+        </v-col>
+      </v-row>
+      <v-card-subtitle
+        v-if="!shown"
+      >
+        No events found.
+      </v-card-subtitle>
       <v-card-text
+        v-if="shown"
         class="text-body-1"
       >
         <v-row>
@@ -117,7 +135,11 @@
       </v-divider>
 
       <v-card-actions>
-        <v-btn text class="text-capitalize">
+        <v-btn
+          text
+          class="text-capitalize"
+          @click="refreshData"
+        >
           <v-icon right>
              mdi-refresh
           </v-icon>
@@ -134,7 +156,14 @@ export default Vue.extend({
   name: 'CustomCardEvent',
 
   props: [
-    'globalPrefix', 'zones', 'eventTypes', 'startDate', 'endDate', 'lastModifiedBy'
+    'globalPrefix',
+    'zones',
+    'eventTypes',
+    'startDate',
+    'endDate',
+    'lastModifiedBy',
+    'shown',
+    'loading'
   ],
 
   data () {
@@ -144,7 +173,9 @@ export default Vue.extend({
   },
 
   methods: {
-
+    refreshData () {
+      this.$emit('refresh-data')
+    }
   }
 })
 </script>

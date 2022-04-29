@@ -4,13 +4,23 @@
       <v-col
         cols="12"
       >
+        <v-skeleton-loader
+          v-if="!eventCardLoaded"
+          type="card"
+          transition="scale-transition"
+        >
+        </v-skeleton-loader>
         <custom-card-event
-          :globalPrefix="event.globalPrefix"
-          :zones="event.zones"
-          :eventTypes="event.eventTypes"
-          :startDate="event.startDate"
-          :endDate="event.endDate"
-          :lastModifiedBy="event.lastModifiedBy"
+          v-if="eventCardLoaded"
+          @refresh-data="getLatestEvent"
+          :shown="eventShown"
+          :globalPrefix="latestEvent.system"
+          :zones="latestEvent.zones"
+          :eventTypes="latestEvent.event_types"
+          :startDate="latestEvent.start_date"
+          :endDate="latestEvent.end_date"
+          :lastModifiedBy="latestEvent.last_changed_by"
+          :loading="eventCardReload"
         >
         </custom-card-event>
       </v-col>
@@ -20,10 +30,20 @@
       <v-col
         cols="4"
       >
+        <v-skeleton-loader
+          :max-height="smallCardHeight"
+          v-if="!systemsLoaded"
+          type="card"
+          transition="scale-transition"
+        >
+        </v-skeleton-loader>
         <custom-card-basic
+          v-if="systemsLoaded"
+          @refresh-data="getSystemCount"
           :cardIcon="systems.icon"
           :cardName="systems.name"
-          :cardContent="systems.content"
+          :cardContent="systemCount"
+          :loading="systemReload"
         >
         </custom-card-basic>
       </v-col>
@@ -31,10 +51,20 @@
       <v-col
         cols="4"
       >
+        <v-skeleton-loader
+          :max-height="smallCardHeight"
+          v-if="!eventsLoaded"
+          type="card"
+          transition="scale-transition"
+        >
+        </v-skeleton-loader>
         <custom-card-basic
+          v-if="eventsLoaded"
+          @refresh-data="getEventCount"
           :cardIcon="events.icon"
           :cardName="events.name"
-          :cardContent="events.content"
+          :cardContent="eventCount"
+          :loading="eventReload"
         >
         </custom-card-basic>
       </v-col>
@@ -42,10 +72,20 @@
       <v-col
         cols="4"
       >
+        <v-skeleton-loader
+          :max-height="smallCardHeight"
+          v-if="!usersLoaded"
+          type="card"
+          transition="scale-transition"
+        >
+        </v-skeleton-loader>
         <custom-card-basic
+          v-if="usersLoaded"
+          @refresh-data="getUserCount"
           :cardIcon="users.icon"
           :cardName="users.name"
-          :cardContent="users.content"
+          :cardContent="userCount"
+          :loading="userReload"
         >
         </custom-card-basic>
       </v-col>
@@ -55,6 +95,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import { mapActions, mapGetters } from 'vuex'
 import CustomCardBasic from '@/components/CustomCardBasic.vue'
 import CustomCardEvent from '@/components/CustomCardEvent.vue'
 
@@ -69,6 +110,16 @@ export default Vue.extend({
 
   data () {
     return {
+      eventCardLoaded: false,
+      systemsLoaded: false,
+      eventsLoaded: false,
+      usersLoaded: false,
+      eventShown: false,
+      smallCardHeight: 185,
+      eventCardReload: false,
+      systemReload: false,
+      eventReload: false,
+      userReload: false,
       systems: {
         name: 'Systems',
         icon: 'mdi-web',
@@ -83,8 +134,7 @@ export default Vue.extend({
 
       users: {
         name: 'Users',
-        icon: 'mdi-heart-outline',
-        content: '5'
+        icon: 'mdi-heart-outline'
       },
 
       event: {
@@ -98,8 +148,82 @@ export default Vue.extend({
     }
   },
 
-  methods: {
+  computed: {
+    ...mapGetters({
+      systemCount: 'getSystemCount',
+      eventCount: 'getEventCount',
+      userCount: 'getUserCount',
+      latestEvent: 'getLatestEvent'
+    })
+  },
 
+  methods: {
+    ...mapActions([
+      'GetSystemCount',
+      'GetEventCount',
+      'GetUserCount',
+      'GetLatestEvent'
+    ]),
+
+    async getSystemCount () {
+      try {
+        this.systemReload = true
+        await this.GetSystemCount()
+        this.systemReload = false
+      } catch (error) {
+
+      }
+    },
+
+    async getEventCount () {
+      try {
+        this.eventReload = true
+        await this.GetEventCount()
+        this.eventReload = false
+      } catch (error) {
+
+      }
+    },
+
+    async getUserCount () {
+      try {
+        this.userReload = true
+        await this.GetUserCount()
+        this.userReload = false
+      } catch (error) {
+
+      }
+    },
+
+    async getLatestEvent () {
+      try {
+        this.eventCardReload = true
+        await this.GetLatestEvent()
+        this.eventCardReload = false
+      } catch (error) {
+
+      }
+    }
+  },
+
+  async mounted () {
+    await Promise.all([
+      this.getSystemCount(),
+      this.getEventCount(),
+      this.getUserCount()
+    ])
+    this.systemsLoaded = true
+    this.eventsLoaded = true
+    this.usersLoaded = true
+
+    if (this.eventCount === 0) {
+      this.eventCardLoaded = true
+      this.eventShown = false
+    } else {
+      await this.getLatestEvent()
+      this.eventCardLoaded = true
+      this.eventShown = true
+    }
   }
 })
 </script>
