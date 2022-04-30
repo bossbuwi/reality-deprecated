@@ -20,8 +20,11 @@
       <v-card-text>
         <v-data-table
           :headers="headers"
-          :items="systems"
+          :items="systemsList"
           :items-per-page="5"
+          item-key="id"
+          :loading="loading"
+          loading-text="Fetching data, please wait."
         >
         </v-data-table>
       </v-card-text>
@@ -137,6 +140,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import { mapActions, mapGetters } from 'vuex'
 
 export default Vue.extend({
   name: 'SystemsView',
@@ -146,12 +150,13 @@ export default Vue.extend({
   data () {
     return {
       dialog: false,
+      loading: false,
       headers: [
         {
           text: 'System Prefix',
           align: 'start',
           sortable: true,
-          value: 'globalPrefix'
+          value: 'global_prefix'
         },
         {
           text: 'Machine',
@@ -171,46 +176,34 @@ export default Vue.extend({
           sortable: true,
           value: 'release'
         }
-      ],
-      systems: [
-        {
-          globalPrefix: 'OS',
-          machine: 'MNQ',
-          zones: 'O4, O5',
-          release: 'FM 2021.C'
-        },
-        {
-          globalPrefix: 'YY',
-          machine: 'MNQ',
-          zones: 'Y5, Y6',
-          release: 'FM 2021.B'
-        },
-        {
-          globalPrefix: 'OP',
-          machine: 'MNQ',
-          zones: 'O5, O6',
-          release: 'FM SP19'
-        },
-        {
-          globalPrefix: 'TY',
-          machine: 'MNP',
-          zones: 'T1',
-          release: 'FPM 2022.1'
-        },
-        {
-          globalPrefix: 'NI',
-          machine: 'MNP',
-          zones: 'N1',
-          release: 'FM 2022.C'
-        },
-        {
-          globalPrefix: 'EU',
-          machine: 'MNE',
-          zones: 'E7',
-          release: 'FM 2022.A'
-        }
       ]
     }
+  },
+
+  computed: {
+    ...mapGetters({
+      systemsList: 'getSystemsList'
+    })
+  },
+
+  methods: {
+    ...mapActions([
+      'GetSystemsList'
+    ]),
+
+    async getSystems () {
+      try {
+        this.loading = true
+        await this.GetSystemsList()
+        this.loading = false
+      } catch (error) {
+
+      }
+    }
+  },
+
+  async mounted () {
+    await this.getSystems()
   }
 })
 </script>

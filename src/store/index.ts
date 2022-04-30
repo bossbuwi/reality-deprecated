@@ -26,6 +26,8 @@ export default new Vuex.Store({
     events
   },
   plugins: [createPersistedState({
+    key: 'theworldiswaiting',
+    storage: window.sessionStorage,
     paths: ['auth.user']
   })]
 })
