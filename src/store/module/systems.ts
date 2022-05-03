@@ -1,3 +1,4 @@
+/* eslint-disable */
 import axios from 'axios'
 import { Commit } from 'vuex'
 import { System } from 'src/models/system'
