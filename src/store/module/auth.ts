@@ -31,12 +31,12 @@ const actions = {
   },
 
   async Logout ({ commit }: { commit: Commit }) {
-    commit('resetState')
+    commit('resetAuthState')
   }
 }
 
 const mutations = {
-  resetState (state: any) {
+  resetAuthState (state: any) {
     Object.assign(state, getDefaultState())
   },
 

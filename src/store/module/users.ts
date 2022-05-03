@@ -34,7 +34,7 @@ const actions = {
 }
 
 const mutations = {
-  resetState (state: any) {
+  resetUserState (state: any) {
     Object.assign(state, getDefaultState())
   },
 
