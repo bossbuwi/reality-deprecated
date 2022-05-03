@@ -32,7 +32,7 @@ const actions = {
 }
 
 const mutations = {
-  resetState (state: any) {
+  resetMachineState (state: any) {
     Object.assign(state, getDefaultState())
   },
 

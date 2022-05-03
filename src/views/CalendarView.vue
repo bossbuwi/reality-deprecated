@@ -66,9 +66,6 @@
               <v-list-item @click="type = 'month'">
                 <v-list-item-title>Month</v-list-item-title>
               </v-list-item>
-              <v-list-item @click="type = '4day'">
-                <v-list-item-title>4 days</v-list-item-title>
-              </v-list-item>
             </v-list>
           </v-menu>
         </v-toolbar>
@@ -86,6 +83,7 @@
           @click:date="viewDay"
           @change="updateRange"
         ></v-calendar>
+        <!-- This is the popup that opens when an event is clicked -->
         <v-menu
           v-model="selectedOpen"
           :close-on-content-click="false"
@@ -114,7 +112,7 @@
               </v-btn>
             </v-toolbar>
             <v-card-text>
-              <span v-html="selectedEvent.details"></span>
+              <span v-html="selectedEvent.event_types"></span>
             </v-card-text>
             <v-card-actions>
               <v-btn
@@ -134,6 +132,7 @@
 
 <script>
 import Vue from 'vue'
+import { mapActions, mapGetters } from 'vuex'
 
 export default Vue.extend({
   name: 'CalendarView',
@@ -144,19 +143,36 @@ export default Vue.extend({
     typeToLabel: {
       month: 'Month',
       week: 'Week',
-      day: 'Day',
-      '4day': '4 Days'
+      day: 'Day'
     },
     selectedEvent: {},
     selectedElement: null,
     selectedOpen: false,
     events: [],
-    colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'],
-    names: ['Meeting', 'Holiday', 'PTO', 'Travel', 'Event', 'Birthday', 'Conference', 'Party']
+    colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1']
   }),
 
+  computed: {
+    ...mapGetters({
+      eventsOnDateRange: 'getEventsOnDateRange'
+    })
+  },
+
   methods: {
+    ...mapActions([
+      'GetEventsOnDateRange'
+    ]),
+
+    async getEventsOnDateRange (dateRange) {
+      try {
+        await this.GetEventsOnDateRange(dateRange)
+      } catch (error) {
+
+      }
+    },
+
     viewDay ({ date }) {
+      console.log('click:more')
       this.focus = date
       this.type = 'day'
     },
@@ -165,19 +181,23 @@ export default Vue.extend({
       return event.color
     },
 
+    /* Used on the UI */
     setToday () {
       this.focus = ''
     },
 
+    /* Used on the UI */
     prev () {
       this.$refs.calendar.prev()
     },
 
+    /* Used on the UI */
     next () {
       this.$refs.calendar.next()
     },
 
     showEvent ({ nativeEvent, event }) {
+      console.log(event)
       const open = () => {
         this.selectedEvent = event
         this.selectedElement = nativeEvent.target
@@ -192,35 +212,77 @@ export default Vue.extend({
       nativeEvent.stopPropagation()
     },
 
-    updateRange ({ start, end }) {
+    async updateRange ({ start, end }) {
+      const range = {
+        startDate: start.date,
+        endDate: end.date
+      }
+
+      await this.getEventsOnDateRange(range)
+
       const events = []
-      const min = new Date(`${start.date}T00:00:00`)
-      const max = new Date(`${end.date}T23:59:59`)
-      const days = (max.getTime() - min.getTime()) / 86400000
-      const eventCount = this.rnd(days, days + 20)
+      const eventCount = this.eventsOnDateRange.length
+
       for (let i = 0; i < eventCount; i++) {
-        const allDay = this.rnd(0, 3) === 0
-        const firstTimestamp = this.rnd(min.getTime(), max.getTime())
-        const first = new Date(firstTimestamp - (firstTimestamp % 900000))
-        const secondTimestamp = this.rnd(2, allDay ? 288 : 8) * 900000
-        const second = new Date(first.getTime() + secondTimestamp)
+        const eventItem = this.eventsOnDateRange[i]
         events.push({
-          name: this.names[this.rnd(0, this.names.length - 1)],
-          start: first,
-          end: second,
+          /* Event Model Properties */
+          id: eventItem.id,
+          system: eventItem.system,
+          zones: eventItem.zones,
+          event_types: eventItem.event_types,
+          start_date: eventItem.start_date,
+          end_date: eventItem.end_date,
+          jira_case: eventItem.jira_case,
+          features_on: eventItem.features_on,
+          features_off: eventItem.features_off,
+          compiled_sources: eventItem.compiled_sources,
+          api_used: eventItem.api_used,
+          created_by: eventItem.created_by,
+          creation_date: eventItem.creation_date,
+          last_changed_by: eventItem.last_changed_by,
+          last_changed_date: eventItem.last_changed_date,
+          /* Vuetify Default Properties */
+          name: eventItem.created_by,
+          start: Date.parse(eventItem.start_date),
+          end: Date.parse(eventItem.end_date),
           color: this.colors[this.rnd(0, this.colors.length - 1)],
-          timed: !allDay
+          timed: false
         })
       }
+
       this.events = events
     },
+
+    // updateRange ({ start, end }) {
+    //   const events = []
+    //   const min = new Date(`${start.date}T00:00:00`)
+    //   const max = new Date(`${end.date}T23:59:59`)
+    //   const days = (max.getTime() - min.getTime()) / 86400000
+    //   const eventCount = this.rnd(days, days + 20)
+    //   for (let i = 0; i < eventCount; i++) {
+    //     const allDay = this.rnd(0, 3) === 0
+    //     const firstTimestamp = this.rnd(min.getTime(), max.getTime())
+    //     const first = new Date(firstTimestamp - (firstTimestamp % 900000))
+    //     const secondTimestamp = this.rnd(2, allDay ? 288 : 8) * 900000
+    //     const second = new Date(first.getTime() + secondTimestamp)
+    //     events.push({
+    //       name: this.names[this.rnd(0, this.names.length - 1)],
+    //       start: first,
+    //       end: second,
+    //       color: this.colors[this.rnd(0, this.colors.length - 1)],
+    //       timed: !allDay
+    //     })
+    //   }
+    //   this.events = events
+    // },
 
     rnd (a, b) {
       return Math.floor((b - a + 1) * Math.random()) + a
     }
   },
 
-  mounted () {
+  async mounted () {
     this.$refs.calendar.checkChange()
   }
 })

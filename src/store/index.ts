@@ -7,6 +7,7 @@ import users from './module/users'
 import machines from './module/machines'
 import systems from './module/systems'
 import events from './module/events'
+import calendar from './module/calendar'
 
 Vue.use(Vuex)
 const ls = new SecureLS({ isCompression: false })
@@ -25,7 +26,8 @@ export default new Vuex.Store({
     users,
     machines,
     systems,
-    events
+    events,
+    calendar
   },
   plugins: [createPersistedState({
     key: 'theworldiswaiting',
