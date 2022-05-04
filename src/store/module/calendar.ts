@@ -5,7 +5,7 @@ import { Event } from '@/models/event'
 
 const getDefaultState = () => {
   return {
-    month: [
+    range: [
 
     ]
   }
@@ -14,7 +14,7 @@ const getDefaultState = () => {
 const state = getDefaultState()
 
 const getters = {
-  getEventsOnDateRange: (state: any) => state.month
+  getEventsOnDateRange: (state: any) => state.range
 }
 
 const actions = {
@@ -32,7 +32,7 @@ const actions = {
     }).then((result) => {
       const eventArr = result.data as Event[]
       eventArr.forEach((element: Event) => {
-        commit('addEventOnMonth', element)
+        commit('addEventOnRange', element)
       })
     }).catch((error) => {
       console.log(error.response.data)
@@ -45,8 +45,8 @@ const mutations = {
     Object.assign(state, getDefaultState())
   },
 
-  addEventOnMonth (state: any, event: Event) {
-    state.month.push(event)
+  addEventOnRange (state: any, event: Event) {
+    state.range.push(event)
   }
 }
 
