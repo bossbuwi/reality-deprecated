@@ -20,7 +20,7 @@ const actions = {
   async GetMachineCount ({ commit, getters, rootGetters }: { commit: Commit, getters: any, rootGetters: any }) {
     const token = rootGetters.getToken
     let count = 0
-    await axios.get('sonata/machines/count', {
+    await axios.get('sonata/con/machines/count', {
       headers: {
         Authorization: 'Bearer ' + token
       }

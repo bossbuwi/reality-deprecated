@@ -25,7 +25,7 @@ const actions = {
   async GetSystemCount ({ commit, getters, rootGetters }: { commit: Commit, getters: any, rootGetters: any }) {
     const token = rootGetters.getToken
     let count = 0
-    await axios.get('sonata/systems/count', {
+    await axios.get('sonata/con/systems/count', {
       headers: {
         Authorization: 'Bearer ' + token
       }
@@ -40,7 +40,7 @@ const actions = {
   async GetSystemsList ({ commit, getters, rootGetters }: { commit: Commit, getters: any, rootGetters: any }) {
     commit('resetSystemState')
     const token = rootGetters.getToken
-    await axios.get('sonata/systems/index', {
+    await axios.get('sonata/con/systems/index', {
       headers: {
         Authorization: 'Bearer ' + token
       }

@@ -21,7 +21,7 @@ const actions = {
   async GetEventsOnDateRange ({ commit, getters, rootGetters }: { commit: Commit, getters: any, rootGetters: any }, date: any) {
     commit('resetCalendarState')
     const token = rootGetters.getToken
-    await axios.get('sonata/events/date/range', {
+    await axios.get('sonata/con/events/date/range', {
       headers: {
         Authorization: 'Bearer ' + token
       },

@@ -20,7 +20,7 @@ const actions = {
   async GetUserCount ({ commit, getters, rootGetters }: { commit: Commit, getters: any, rootGetters: any }) {
     const token = rootGetters.getToken
     let count = 0
-    await axios.get('symphony/users/count', {
+    await axios.get('symphony/con/users/count', {
       headers: {
         Authorization: 'Bearer ' + token
       }
