@@ -20,8 +20,11 @@
       <v-card-text>
         <v-data-table
           :headers="headers"
-          :items="events"
+          :items="eventsList"
+          item-key="id"
           :items-per-page="10"
+          :loading="loading"
+          loading-text="Fetching data, please wait."
         >
         </v-data-table>
       </v-card-text>
@@ -222,6 +225,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import { mapActions, mapGetters } from 'vuex'
 
 export default Vue.extend({
   name: 'EventsView',
@@ -235,6 +239,7 @@ export default Vue.extend({
       sDateMenu: false,
       eDateMenu: false,
       dialog: false,
+      loading: false,
       headers: [
         {
           text: 'System',
@@ -252,38 +257,54 @@ export default Vue.extend({
           text: 'Event Type',
           align: 'start',
           sortable: true,
-          value: 'eventType'
+          value: 'event_types'
         },
         {
           text: 'Start Date',
           align: 'start',
           sortable: true,
-          value: 'startDate'
+          value: 'start_date'
         },
         {
           text: 'End Date',
           align: 'start',
           sortable: true,
-          value: 'endDate'
-        }
-      ],
-      events: [
-        {
-          system: 'MNQ - OS',
-          zones: 'O4, O5',
-          eventType: 'SYSMAINT',
-          startDate: '2022-04-20',
-          endDate: '2022-04-22'
+          value: 'end_date'
         },
         {
-          system: 'MNQ - YY',
-          zones: 'Y5',
-          eventType: 'IC, COB',
-          startDate: '2022-04-20',
-          endDate: '2022-04-22'
+          text: 'Created By',
+          align: 'start',
+          sortable: true,
+          value: 'created_by'
         }
       ]
     }
+  },
+
+  computed: {
+    ...mapGetters({
+      eventsList: 'getEventsList'
+    })
+  },
+
+  methods: {
+    ...mapActions([
+      'GetEventsList'
+    ]),
+
+    async getEvents () {
+      try {
+        this.loading = true
+        await this.GetEventsList()
+        this.loading = false
+      } catch (error) {
+
+      }
+    }
+  },
+
+  async mounted () {
+    await this.getEvents()
   }
 })
 </script>

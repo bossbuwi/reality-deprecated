@@ -7,6 +7,9 @@ const getDefaultState = () => {
     events: {
       count: 0 as number
     },
+    list: [
+
+    ],
     latestEvent: {
       id: 0 as number,
       system: '' as string,
@@ -23,7 +26,8 @@ const state = getDefaultState()
 
 const getters = {
   getEventCount: (state: any) => state.events.count,
-  getLatestEvent: (state:any) => state.latestEvent
+  getLatestEvent: (state:any) => state.latestEvent,
+  getEventsList: (state: any) => state.list
 }
 
 const actions = {
@@ -49,8 +53,25 @@ const actions = {
         Authorization: 'Bearer ' + token
       }
     }).then((result) => {
-      console.log(result.data)
       commit('setLatestEvent', result.data)
+    }).catch((error) => {
+      console.log(error.response.data)
+    })
+  },
+
+  async GetEventsList ({ commit, getters, rootGetters }: { commit: Commit, getters: any, rootGetters: any }) {
+    commit('resetEventState')
+    const token = rootGetters.getToken
+    await axios.get('sonata/events/index', {
+      headers: {
+        Authorization: 'Bearer ' + token
+      }
+    }).then((result) => {
+      console.log(result.data)
+      const eventArr = result.data as Event[]
+      eventArr.forEach((element: Event) => {
+        commit('addEventToList', element)
+      });
     }).catch((error) => {
       console.log(error.response.data)
     })
@@ -64,6 +85,10 @@ const mutations = {
 
   setEventCount (state: any, count: number) {
     state.events.count = count
+  },
+
+  addEventToList (state: any, event: Event) {
+    state.list.push(event)
   },
 
   setLatestEvent (state: any, event: any) {

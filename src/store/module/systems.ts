@@ -38,6 +38,7 @@ const actions = {
   },
 
   async GetSystemsList ({ commit, getters, rootGetters }: { commit: Commit, getters: any, rootGetters: any }) {
+    commit('resetSystemState')
     const token = rootGetters.getToken
     await axios.get('sonata/systems/index', {
       headers: {
