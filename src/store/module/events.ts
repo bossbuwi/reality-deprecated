@@ -34,7 +34,7 @@ const actions = {
   async GetEventCount ({ commit, getters, rootGetters }: { commit: Commit, getters: any, rootGetters: any }) {
     const token = rootGetters.getToken
     let count = 0
-    await axios.get('sonata/events/count', {
+    await axios.get('sonata/con/events/count', {
       headers: {
         Authorization: 'Bearer ' + token
       }
@@ -48,7 +48,7 @@ const actions = {
 
   async GetLatestEvent ({ commit, getters, rootGetters }: { commit: Commit, getters: any, rootGetters: any }) {
     const token = rootGetters.getToken
-    await axios.get('sonata/events/latest', {
+    await axios.get('sonata/con/events/latest', {
       headers: {
         Authorization: 'Bearer ' + token
       }
@@ -62,7 +62,7 @@ const actions = {
   async GetEventsList ({ commit, getters, rootGetters }: { commit: Commit, getters: any, rootGetters: any }) {
     commit('resetEventState')
     const token = rootGetters.getToken
-    await axios.get('sonata/events/index', {
+    await axios.get('sonata/con/events/index', {
       headers: {
         Authorization: 'Bearer ' + token
       }

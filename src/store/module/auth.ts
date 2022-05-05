@@ -24,7 +24,7 @@ const getters = {
 const actions = {
   async Login ({ commit }: { commit: Commit }, form: any) {
     let user = null
-    await axios.post('concerto/login', form).then((result) => {
+    await axios.post('concerto/con/login', form).then((result) => {
       user = result.data
     })
     commit('setUser', user)
