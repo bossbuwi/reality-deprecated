@@ -8,7 +8,7 @@
         <v-spacer></v-spacer>
         <v-btn
           color="primary"
-          @click.stop="dialog = true"
+          @click.stop="openForm"
         >
           <v-icon left>
             mdi-playlist-plus
@@ -25,200 +25,54 @@
           :items-per-page="10"
           :loading="loading"
           loading-text="Fetching data, please wait."
+          @click:row="itemClicked"
+          @contextmenu:row.prevent="itemRightClicked"
         >
         </v-data-table>
       </v-card-text>
     </v-card>
-    <!-- Dialog -->
+
+    <!-- Item Context Menu -->
+    <v-menu
+      v-model="showMenu"
+      rounded="lg"
+      :position-x="x"
+      :position-y="y"
+      absolute
+      offset-y
+    >
+      <v-list>
+        <v-list-item
+          link
+          @click="editItem"
+        >
+          <v-list-item-title>Edit</v-list-item-title>
+        </v-list-item>
+        <v-list-item
+          link
+          @click="deleteItem"
+        >
+          <v-list-item-title>Delete</v-list-item-title>
+        </v-list-item>
+      </v-list>
+    </v-menu>
+
+    <!-- Event Full Screen Dialog -->
     <v-dialog
       v-model="dialog"
       persistent
       eager
       fullscreen
     >
-      <v-card>
-        <v-toolbar
-          dark
-          dense
-          color="primary"
-        >
-          <v-btn
-            icon
-            dark
-            @click="dialog = false"
-          >
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-          <v-toolbar-title>New Event</v-toolbar-title>
-          <v-spacer></v-spacer>
-        </v-toolbar>
-        <v-card-text>
-          <v-container>
-            <v-row>
-              <v-col
-                cols="12"
-                sm="6"
-                md="4"
-              >
-                <v-select
-                  :items="['MNQ-OS', 'MNQ-YY', 'MNP-TY']"
-                  label="System*"
-                  required
-                ></v-select>
-              </v-col>
-              <v-col
-                cols="12"
-                sm="6"
-                md="4"
-              >
-                <v-select
-                  :items="['O4', 'O5']"
-                  label="Zone*"
-                  multiple
-                  required
-                ></v-select>
-              </v-col>
-              <v-col
-                cols="12"
-                sm="6"
-                md="4"
-              >
-                <v-select
-                  :items="['IC', 'COB']"
-                  label="Event Type*"
-                  multiple
-                  required
-                ></v-select>
-              </v-col>
-              <v-col
-                cols="12"
-                sm="6"
-                md="6"
-              >
-                <v-menu
-                  v-model="sDateMenu"
-                  :close-on-content-click="false"
-                  :nudge-right="40"
-                  transition="scale-transition"
-                  offset-y
-                  min-width="auto"
-                >
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-text-field
-                      v-model="startDate"
-                      label="Start Date*"
-                      prepend-icon="mdi-calendar"
-                      readonly
-                      v-bind="attrs"
-                      v-on="on"
-                    ></v-text-field>
-                  </template>
-                    <v-date-picker
-                      no-title
-                      v-model="startDate"
-                      @input="sDateMenu = false"
-                    ></v-date-picker>
-                </v-menu>
-              </v-col>
-              <v-col
-                cols="12"
-                sm="6"
-                md="6"
-              >
-                <v-menu
-                  v-model="eDateMenu"
-                  :close-on-content-click="false"
-                  :nudge-right="40"
-                  transition="scale-transition"
-                  offset-y
-                  min-width="auto"
-                >
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-text-field
-                      v-model="endDate"
-                      label="End Date*"
-                      prepend-icon="mdi-calendar"
-                      readonly
-                      v-bind="attrs"
-                      v-on="on"
-                    ></v-text-field>
-                  </template>
-                    <v-date-picker
-                      no-title
-                      v-model="endDate"
-                      @input="eDateMenu = false"
-                    ></v-date-picker>
-                </v-menu>
-              </v-col>
-              <v-col
-                cols="12"
-                sm="6"
-                md="4"
-              >
-                <v-text-field
-                  label="Jira Reference"
-                  type="text"
-                ></v-text-field>
-              </v-col>
-              <v-col
-                cols="12"
-                sm="6"
-                md="4"
-              >
-                <v-text-field
-                  label="Features Turned On"
-                  hint="Please separate entries with a comma."
-                  type="text"
-                ></v-text-field>
-              </v-col>
-              <v-col
-                cols="12"
-                sm="6"
-                md="4"
-              >
-                <v-text-field
-                  label="Features Turned Off"
-                  hint="Please separate entries with a comma."
-                  type="text"
-                ></v-text-field>
-              </v-col>
-              <v-col
-                cols="12"
-                sm="6"
-                md="6"
-              >
-                <v-text-field
-                  label="Compiled Sources"
-                  hint="Please separate entries with a comma."
-                  type="text"
-                ></v-text-field>
-              </v-col>
-              <v-col
-                cols="12"
-                sm="6"
-                md="6"
-              >
-                <v-text-field
-                  label="API Used"
-                  hint="Please separate entries with a comma."
-                  type="text"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-          </v-container>
-          <small>*indicates required field</small>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="blue darken-1"
-            text
-            @click="dialog = false"
-          >
-            Submit
-          </v-btn>
-        </v-card-actions>
-      </v-card>
+      <event-form
+        @form-close="closeForm"
+        @form-submit="formSuccess"
+        :title="formTitle"
+        :titleBarColor="formTitleBarColor"
+        :mode="formMode"
+        :key="recreate"
+      >
+      </event-form>
     </v-dialog>
   </v-container>
 </template>
@@ -226,21 +80,33 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapActions, mapGetters } from 'vuex'
+import EventForm from '../components/EventForm.vue'
 
 export default Vue.extend({
   name: 'EventsView',
 
-  components: {},
+  components: {
+    EventForm
+  },
 
   data () {
     return {
-      startDate: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-      endDate: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-      sDateMenu: false,
-      eDateMenu: false,
+      recreate: 0,
       dialog: false,
+      formTitle: '',
+      formTitleBarColor: '',
+      formMode: '',
+      showMenu: false,
+      x: 0,
+      y: 0,
       loading: false,
       headers: [
+        {
+          text: 'ID',
+          align: 'start',
+          sortable: true,
+          value: 'id'
+        },
         {
           text: 'System',
           align: 'start',
@@ -277,19 +143,34 @@ export default Vue.extend({
           sortable: true,
           value: 'created_by'
         }
-      ]
+      ],
+      selectedEvent: {
+        id: 0,
+        machine: '',
+        system: '',
+        zones: [],
+        event_types: [],
+        start_date: '',
+        end_date: '',
+        jira_case: '',
+        features_on: '',
+        features_off: '',
+        compiled_sources: '',
+        api_used: ''
+      }
     }
   },
 
   computed: {
     ...mapGetters({
-      eventsList: 'getEventsList'
+      eventsList: 'getEventsList',
+      event: 'getEvent'
     })
   },
 
   methods: {
     ...mapActions([
-      'GetEventsList'
+      'GetEventsList', 'SetEvent'
     ]),
 
     async getEvents () {
@@ -300,6 +181,105 @@ export default Vue.extend({
       } catch (error) {
 
       }
+    },
+
+    formSuccess (param: string) {
+      if (param === 'success') {
+        this.completeMode()
+      } else if (param === 'error') {
+        this.errorMode()
+      }
+    },
+
+    openForm () {
+      this.dialog = true
+      this.createMode()
+    },
+
+    closeForm () {
+      this.getEvents()
+      this.dialog = false
+    },
+
+    async enquireMode () {
+      await this.SetEvent(this.selectedEvent)
+      this.recreate += 1
+      this.formTitle = 'Displaying Event #' + this.selectedEvent.id
+      this.formTitleBarColor = 'secondary'
+      this.formMode = 'enquire'
+    },
+
+    async createMode () {
+      await this.SetEvent('')
+      this.recreate += 1
+      this.formTitle = 'New Event'
+      this.formTitleBarColor = 'primary'
+      this.formMode = 'create'
+    },
+
+    async updateMode () {
+      await this.SetEvent(this.selectedEvent)
+      this.recreate += 1
+      this.formTitle = 'Update Event #' + this.selectedEvent.id
+      this.formTitleBarColor = 'accent'
+      this.formMode = 'update'
+    },
+
+    async deleteMode () {
+      await this.SetEvent(this.selectedEvent)
+      this.recreate += 1
+      this.formTitle = 'Delete Event #' + this.selectedEvent.id
+      this.formTitleBarColor = 'warning'
+      this.formMode = 'delete'
+    },
+
+    completeMode () {
+      switch (this.formMode) {
+        case 'create':
+          this.formTitle = 'Event #' + this.event.id + ' added!'
+          break
+        case 'update':
+          this.formTitle = 'Event #' + this.event.id + ' updated!'
+          break
+        case 'delete':
+          this.formTitle = 'Event #' + this.event.id + ' deleted!'
+          break
+        default:
+          break
+      }
+      this.formTitleBarColor = 'success'
+      this.formMode = 'complete'
+    },
+
+    errorMode () {
+      this.formTitle = 'Event error!'
+      this.formTitleBarColor = 'error'
+    },
+
+    itemRightClicked (event: any, { item }: { item: any}) {
+      this.showMenu = false
+      this.selectedEvent = item
+      this.x = event.clientX
+      this.y = event.clientY
+      this.$nextTick(() => {
+        this.showMenu = true
+      })
+    },
+
+    itemClicked (args: any, { item }: { item: any }) {
+      this.selectedEvent = item
+      this.enquireMode()
+      this.dialog = true
+    },
+
+    editItem () {
+      this.updateMode()
+      this.dialog = true
+    },
+
+    deleteItem () {
+      this.deleteMode()
+      this.dialog = true
     }
   },
 

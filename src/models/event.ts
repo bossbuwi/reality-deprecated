@@ -1,5 +1,6 @@
 export class Event {
   id = 0 as number
+  machine = '' as string
   system = '' as string
   zones = [] as string[]
   event_types = [] as string[]

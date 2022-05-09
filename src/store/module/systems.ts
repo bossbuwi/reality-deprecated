@@ -45,7 +45,6 @@ const actions = {
         Authorization: 'Bearer ' + token
       }
     }).then((result) => {
-      console.log(result.data)
       const systemArr = result.data as System[]
       systemArr.forEach((element: System) => {
         commit('addSystemToList', element)

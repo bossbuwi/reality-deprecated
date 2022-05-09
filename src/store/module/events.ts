@@ -18,6 +18,24 @@ const getDefaultState = () => {
       start_date: '' as string,
       end_date: '' as string,
       last_changed_by: '' as string
+    },
+    event: {
+      id: 0 as number,
+      machine: '' as string,
+      system: '' as string,
+      zones: [] as string[],
+      event_types: [] as string[],
+      start_date: '' as string,
+      end_date: '' as string,
+      jira_case: '' as string,
+      features_on: '' as string,
+      features_off: '' as string,
+      compiled_sources: '' as string,
+      api_used: '' as string,
+      created_by: '' as string,
+      creation_date: '' as string,
+      last_changed_by: '' as string,
+      last_changed_date: '' as string
     }
   }
 }
@@ -27,7 +45,8 @@ const state = getDefaultState()
 const getters = {
   getEventCount: (state: any) => state.events.count,
   getLatestEvent: (state:any) => state.latestEvent,
-  getEventsList: (state: any) => state.list
+  getEventsList: (state: any) => state.list,
+  getEvent: (state: any) => state.event
 }
 
 const actions = {
@@ -67,7 +86,6 @@ const actions = {
         Authorization: 'Bearer ' + token
       }
     }).then((result) => {
-      console.log(result.data)
       const eventArr = result.data as Event[]
       eventArr.forEach((element: Event) => {
         commit('addEventToList', element)
@@ -75,6 +93,46 @@ const actions = {
     }).catch((error) => {
       console.log(error.response.data)
     })
+  },
+
+  async PostEvent ({ commit, getters, rootGetters }: { commit: Commit, getters: any, rootGetters: any }, form: any) {
+    const token = rootGetters.getToken
+    await axios.post('sonata/events/event', form, {
+      headers: {
+        Authorization: 'Bearer ' + token
+      }
+    }).then((result) => {
+      console.log(result.data)
+      commit('setEvent', result.data)
+    }).catch((error) => {
+      console.log(error.response.data)
+      commit('clearError')
+      commit('setError', error.response.data)
+    })
+  },
+
+  async PutEvent ({ commit, getters, rootGetters }: { commit: Commit, getters: any, rootGetters: any }, form: any) {
+    const token = rootGetters.getToken
+    await axios.put('sonata/events/event', form, {
+      headers: {
+        Authorization: 'Bearer ' + token
+      }
+    }).then((result) => {
+      commit('setEvent', result.data)
+    }).catch((error) => {
+      console.log(error.response.data)
+      commit('clearError')
+      commit('setError', error.response.data)
+    })
+  },
+
+  async DeleteEvent ({ commit, getters, rootGetters }: { commit: Commit, getters: any, rootGetters: any }, form: any) {
+    console.log('axios delete')
+  },
+
+  SetEvent ({ commit }: { commit: Commit }, args: any) {
+    commit('resetEventState')
+    commit('setEvent', args)
   }
 }
 
@@ -103,6 +161,10 @@ const mutations = {
 
     const eventTypesArr: string[] = event.event_types
     state.latestEvent.event_types = eventTypesArr.join(', ')
+  },
+
+  setEvent (state: any, event: any) {
+    state.event = event
   }
 }
 
