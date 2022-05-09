@@ -127,7 +127,19 @@ const actions = {
   },
 
   async DeleteEvent ({ commit, getters, rootGetters }: { commit: Commit, getters: any, rootGetters: any }, form: any) {
-    console.log('axios delete')
+    const token = rootGetters.getToken
+    const url = 'sonata/events/event/' + form.id
+    await axios.delete(url, {
+      headers: {
+        Authorization: 'Bearer ' + token
+      }
+    }).then((result) => {
+      commit('setEvent', result.data)
+    }).catch((error) => {
+      console.log(error.response.data)
+      commit('clearError')
+      commit('setError', error.response.data)
+    })
   },
 
   SetEvent ({ commit }: { commit: Commit }, args: any) {
