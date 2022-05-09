@@ -102,7 +102,7 @@
     </v-col>
   </v-row>
 </template>
-
+<!-- Typescript is not defined as the language to prevent unnecessary difficulties when setting types -->
 <script>
 import Vue from 'vue'
 import { mapActions, mapGetters } from 'vuex'
