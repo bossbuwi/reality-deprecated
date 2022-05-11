@@ -91,7 +91,7 @@
           offset-x
         >
           <event-popup
-            :title="selectedEvent.name"
+            :title="popupTitle"
             :color="selectedEvent.color"
             :eventItem="selectedEvent"
             @close-popup="closePopup"
@@ -114,6 +114,7 @@ export default Vue.extend({
   components: { EventPopup },
 
   data: () => ({
+    popupTitle: '',
     focus: '',
     type: 'month',
     typeToLabel: {
@@ -175,6 +176,7 @@ export default Vue.extend({
     },
 
     showEvent ({ nativeEvent, event }) {
+      this.popupTitle = 'Event #' + event.id + ' by ' + event.created_by
       const open = () => {
         let zones = ''
         if (Array.isArray(event.zones)) {
