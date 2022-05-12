@@ -8,7 +8,8 @@ const getDefaultState = () => {
       id: 0 as number,
       username: '' as string,
       roles: [] as string[],
-      token: '' as string
+      token: '' as string,
+      created: {} as Date
     }
   }
 }
@@ -26,6 +27,8 @@ const actions = {
     let user = null
     await axios.post('concerto/con/login', form).then((result) => {
       user = result.data
+      const dateNow = new Date()
+      user.created = dateNow
     })
     commit('setUser', user)
   },
