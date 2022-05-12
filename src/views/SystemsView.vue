@@ -7,6 +7,7 @@
         Systems List
         <v-spacer></v-spacer>
         <v-btn
+          v-if="newBtnShown"
           color="primary"
           @click.stop="dialog = true"
         >
@@ -149,6 +150,7 @@ export default Vue.extend({
 
   data () {
     return {
+      newBtnShown: true,
       dialog: false,
       loading: false,
       headers: [
@@ -182,7 +184,8 @@ export default Vue.extend({
 
   computed: {
     ...mapGetters({
-      systemsList: 'getSystemsList'
+      systemsList: 'getSystemsList',
+      user: 'getUserState'
     })
   },
 
@@ -203,6 +206,14 @@ export default Vue.extend({
   },
 
   async mounted () {
+    const role = this.user.roles.find((x: string) =>
+      x === 'ROLE_SUPERUSER'
+    )
+
+    if (role === undefined) {
+      this.newBtnShown = false
+    }
+
     await this.getSystems()
   }
 })
