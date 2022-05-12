@@ -65,17 +65,27 @@ export default Vue.extend({
   computed: {
     ...mapGetters({
       dialog: 'getErrorStatus',
-      error: 'getError'
+      error: 'getError',
+      user: 'getUserState'
     })
   },
 
   methods: {
     ...mapActions([
-      'DismissError'
+      'DismissError', 'SetDate', 'Logout'
     ]),
 
     dismissError () {
       this.DismissError()
+    }
+  },
+
+  async created () {
+    const dateNow = new Date()
+    const tokenDate = new Date(this.user.created)
+    const duration = dateNow.valueOf() - tokenDate.valueOf()
+    if (duration > 17000000) {
+      await this.Logout()
     }
   }
 })
