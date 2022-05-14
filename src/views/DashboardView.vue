@@ -4,6 +4,16 @@
       <v-col
         cols="12"
       >
+        <rules-panel
+          :rules="ruleList"
+        >
+        </rules-panel>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col
+        cols="12"
+      >
         <v-skeleton-loader
           v-if="!eventCardLoaded"
           type="card"
@@ -98,14 +108,15 @@ import Vue from 'vue'
 import { mapActions, mapGetters } from 'vuex'
 import CustomCardBasic from '@/components/CustomCardBasic.vue'
 import CustomCardEvent from '@/components/CustomCardEvent.vue'
+import RulesPanel from '@/components/RulesPanel.vue'
 
 export default Vue.extend({
   name: 'DashboardView',
 
   components: {
     CustomCardBasic,
-    CustomCardEvent
-
+    CustomCardEvent,
+    RulesPanel
   },
 
   data () {
@@ -125,18 +136,15 @@ export default Vue.extend({
         icon: 'mdi-web',
         content: '2'
       },
-
       events: {
         name: 'Events',
         icon: 'mdi-calendar',
         content: '20'
       },
-
       users: {
         name: 'Users',
         icon: 'mdi-heart-outline'
       },
-
       event: {
         globalPrefix: 'OS',
         zones: 'O4, O5',
@@ -153,7 +161,8 @@ export default Vue.extend({
       systemCount: 'getSystemCount',
       eventCount: 'getEventCount',
       userCount: 'getUserCount',
-      latestEvent: 'getLatestEvent'
+      latestEvent: 'getLatestEvent',
+      ruleList: 'getRules'
     })
   },
 
@@ -162,7 +171,8 @@ export default Vue.extend({
       'GetSystemCount',
       'GetEventCount',
       'GetUserCount',
-      'GetLatestEvent'
+      'GetLatestEvent',
+      'GetRules'
     ]),
 
     async getSystemCount () {
@@ -203,11 +213,16 @@ export default Vue.extend({
       } catch (error) {
 
       }
+    },
+
+    async getRules () {
+      await this.GetRules()
     }
   },
 
   async mounted () {
     await Promise.all([
+      this.getRules(),
       this.getSystemCount(),
       this.getEventCount(),
       this.getUserCount()
