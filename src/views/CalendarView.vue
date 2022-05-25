@@ -113,6 +113,12 @@ export default Vue.extend({
 
   components: { EventPopup },
 
+  metaInfo () {
+    return {
+      title: process.env.VUE_APP_NAME + ' — Calendar'
+    }
+  },
+
   data: () => ({
     popupTitle: '',
     focus: '',

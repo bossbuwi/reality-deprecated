@@ -6,6 +6,9 @@ const getDefaultState = () => {
   return {
     users: {
       count: 0
+    },
+    details: {
+
     }
   }
 }
@@ -13,7 +16,8 @@ const getDefaultState = () => {
 const state = getDefaultState()
 
 const getters = {
-  getUserCount: (state: any) => state.users.count
+  getUserCount: (state: any) => state.users.count,
+  getUserDetails: (state: any) => state.details
 }
 
 const actions = {
@@ -30,6 +34,22 @@ const actions = {
     }).catch((error) => {
       console.log(error.response.data)
     })
+  },
+
+  async GetUserDetails ({ commit, getters, rootGetters }: { commit: Commit, getters: any, rootGetters: any }) {
+    commit('resetUserState')
+    const token = rootGetters.getToken
+    const userId = rootGetters.getUserState.id
+    const url = '/symphony/users/user/' + userId + '/details'
+    await axios.get(url, {
+      headers: {
+        Authorization: 'Bearer ' + token
+      }
+    }).then((result) => {
+      commit('setUserDetails', result.data)
+    }).catch((error) => {
+      console.log(error.response.data)
+    })
   }
 }
 
@@ -40,6 +60,10 @@ const mutations = {
 
   setUserCount (state: any, count: number) {
     state.users.count = count
+  },
+
+  setUserDetails (state: any, details: any) {
+    state.details = details
   }
 }
 

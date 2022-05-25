@@ -5,7 +5,7 @@
     dense
     clipped-left
   >
-    <v-toolbar-title>Application Name</v-toolbar-title>
+    <v-toolbar-title>{{ appTitle }}</v-toolbar-title>
     <v-spacer></v-spacer>
     <v-menu
       transition="scroll-y-transition"
@@ -36,6 +36,10 @@ export default Vue.extend({
   components: { LoginForm },
   name: 'CustomAppBar',
 
-  data: () => ({})
+  data () {
+    return {
+      appTitle: process.env.VUE_APP_NAME
+    }
+  }
 })
 </script>

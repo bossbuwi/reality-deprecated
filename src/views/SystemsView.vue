@@ -9,7 +9,7 @@
         <v-btn
           v-if="newBtnShown"
           color="primary"
-          @click.stop="dialog = true"
+          @click.stop="openFormDialog"
         >
           <v-icon left>
             mdi-playlist-plus
@@ -25,116 +25,40 @@
           :items-per-page="5"
           item-key="id"
           :loading="loading"
+          sort-by="global_prefix"
           loading-text="Fetching data, please wait."
+          @click:row="itemClicked"
+          @contextmenu:row.prevent="itemRightClicked"
         >
         </v-data-table>
       </v-card-text>
     </v-card>
-    <!-- Dialog -->
+    <!-- New System Dialog -->
     <v-dialog
-      v-model="dialog"
+      v-model="newFormDialog"
       persistent
       eager
       fullscreen
     >
-      <v-card>
-        <v-toolbar
-          dark
-          dense
-          color="primary"
-        >
-          <v-btn
-            icon
-            dark
-            @click="dialog = false"
-          >
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-          <v-toolbar-title>New System</v-toolbar-title>
-          <v-spacer></v-spacer>
-        </v-toolbar>
-        <v-card-text>
-          <v-container>
-            <v-row>
-              <v-col
-                cols="12"
-                sm="6"
-                md="4"
-              >
-                <v-select
-                  :items="['MNQ', 'MNP']"
-                  label="Machine*"
-                  required
-                ></v-select>
-              </v-col>
-              <v-col
-                cols="12"
-                sm="6"
-                md="4"
-              >
-                <v-text-field
-                  label="System Prefix*"
-                  hint="Must be unique within the selected machine."
-                  type="text"
-                ></v-text-field>
-              </v-col>
-              <v-col
-                cols="12"
-                sm="6"
-                md="4"
-              >
-                <v-text-field
-                  label="Software Release*"
-                  type="text"
-                ></v-text-field>
-              </v-col>
-              <v-col
-                cols="12"
-                sm="6"
-                md="6"
-              >
-                <v-text-field
-                  label="URL"
-                  type="text"
-                ></v-text-field>
-              </v-col>
-              <v-col
-                cols="12"
-                sm="6"
-                md="6"
-              >
-                <v-text-field
-                  label="System Admin(s)"
-                  hint="Please separate entries with a comma."
-                  type="text"
-                ></v-text-field>
-              </v-col>
-              <v-col
-                cols="12"
-                sm="6"
-                md="6"
-              >
-                <v-text-field
-                  label="User Login"
-                  hint="Please separate entries with a comma."
-                  type="text"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-          </v-container>
-          <small>*indicates required field</small>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="blue darken-1"
-            text
-            @click="dialog = false"
-          >
-            Submit
-          </v-btn>
-        </v-card-actions>
-      </v-card>
+      <system-form
+        :titleBarColor="formColor"
+        :title="formTitle"
+        @close-popup="closeFormDialog"
+      >
+      </system-form>
+    </v-dialog>
+    <!-- System Details Dialog -->
+    <v-dialog
+      v-model="systemDialog"
+      max-width="600px"
+      persistent
+      eager
+    >
+      <system-popup
+        :systemItem="selectedSystem"
+        @close-popup="closePopup"
+      >
+      </system-popup>
     </v-dialog>
   </v-container>
 </template>
@@ -142,16 +66,29 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapActions, mapGetters } from 'vuex'
+import SystemPopup from '../components/SystemPopup.vue'
+import SystemForm from '../components/SystemForm.vue'
 
 export default Vue.extend({
   name: 'SystemsView',
 
-  components: {},
+  components: {
+    SystemPopup, SystemForm
+  },
+
+  metaInfo () {
+    return {
+      title: process.env.VUE_APP_NAME + ' — Systems'
+    }
+  },
 
   data () {
     return {
+      formTitle: '',
+      formColor: '',
+      systemDialog: false,
       newBtnShown: true,
-      dialog: false,
+      newFormDialog: false,
       loading: false,
       headers: [
         {
@@ -178,7 +115,15 @@ export default Vue.extend({
           sortable: true,
           value: 'release'
         }
-      ]
+      ],
+      selectedSystem: {
+        global_prefix: '',
+        release: '',
+        url: '',
+        machine: '',
+        zones: '',
+        owners: ''
+      }
     }
   },
 
@@ -202,6 +147,30 @@ export default Vue.extend({
       } catch (error) {
 
       }
+    },
+
+    openFormDialog () {
+      this.formTitle = 'New System'
+      this.formColor = 'primary'
+      this.newFormDialog = true
+    },
+
+    closeFormDialog () {
+      this.newFormDialog = false
+    },
+
+    itemClicked (args: any, { item }: { item: any }) {
+      console.log(item)
+      this.selectedSystem = item
+      this.systemDialog = true
+    },
+
+    itemRightClicked (event: any, { item }: { item: any}) {
+      console.log(item)
+    },
+
+    closePopup () {
+      this.systemDialog = false
     }
   },
 

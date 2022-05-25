@@ -10,6 +10,7 @@ import events from './module/events'
 import calendar from './module/calendar'
 import eventtypes from './module/eventtypes'
 import rules from './module/rules'
+import about from './module/about'
 
 Vue.use(Vuex)
 const ls = new SecureLS({ isCompression: false })
@@ -59,7 +60,8 @@ export default new Vuex.Store({
     events,
     calendar,
     eventtypes,
-    rules
+    rules,
+    about
   },
 
   plugins: [createPersistedState({
