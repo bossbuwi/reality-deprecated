@@ -119,6 +119,12 @@ export default Vue.extend({
     RulesPanel
   },
 
+  metaInfo () {
+    return {
+      title: process.env.VUE_APP_NAME + ' — Dashboard'
+    }
+  },
+
   data () {
     return {
       eventCardLoaded: false,

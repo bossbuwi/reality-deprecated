@@ -1,8 +1,9 @@
 const { defineConfig } = require('@vue/cli-service')
+const mode = process.env.VUE_DEV_SERVER
+
 module.exports = defineConfig({
-  // for dev
   devServer: {
-    proxy: 'http://mancswcbman0278:9080/',
+    proxy: mode
   },
   transpileDependencies: [
     'vuetify'

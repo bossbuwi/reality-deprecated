@@ -529,6 +529,7 @@ export default Vue.extend({
     this.systemLoading = false
     this.typesLoading = false
 
+    if (this.mode === 'enquire') this.mapObject()
     if (this.mode === 'update') this.mapObject()
     if (this.mode === 'delete') this.mapObject()
   }

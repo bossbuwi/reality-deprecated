@@ -10,6 +10,12 @@ import Vue from 'vue'
 export default Vue.extend({
   name: 'SettingsView',
 
-  components: {}
+  components: {},
+
+  metaInfo () {
+    return {
+      title: process.env.VUE_APP_NAME + ' — Settings'
+    }
+  }
 })
 </script>

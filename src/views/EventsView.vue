@@ -7,6 +7,7 @@
         Events List
         <v-spacer></v-spacer>
         <v-btn
+          v-if="editAllowed"
           color="primary"
           @click.stop="openForm"
         >
@@ -25,6 +26,8 @@
           :items-per-page="10"
           :loading="loading"
           loading-text="Fetching data, please wait."
+          sort-by="id"
+          sort-desc
           @click:row="itemClicked"
           @contextmenu:row.prevent="itemRightClicked"
         >
@@ -34,6 +37,7 @@
 
     <!-- Item Context Menu -->
     <v-menu
+      v-if="editAllowed"
       v-model="showMenu"
       rounded="lg"
       :position-x="x"
@@ -49,6 +53,7 @@
           <v-list-item-title>Edit</v-list-item-title>
         </v-list-item>
         <v-list-item
+          v-if="deleteAllowed"
           link
           @click="deleteItem"
         >
@@ -89,9 +94,17 @@ export default Vue.extend({
     EventForm
   },
 
+  metaInfo () {
+    return {
+      title: process.env.VUE_APP_NAME + ' — Event'
+    }
+  },
+
   data () {
     return {
       recreate: 0,
+      editAllowed: false,
+      deleteAllowed: false,
       dialog: false,
       formTitle: '',
       formTitleBarColor: '',
@@ -164,7 +177,9 @@ export default Vue.extend({
   computed: {
     ...mapGetters({
       eventsList: 'getEventsList',
-      event: 'getEvent'
+      event: 'getEvent',
+      isAuth: 'isAuthenticated',
+      user: 'getUserState'
     })
   },
 
@@ -285,6 +300,13 @@ export default Vue.extend({
 
   async mounted () {
     await this.getEvents()
+    if (this.isAuth) {
+      this.editAllowed = true
+      const superuser = this.user.roles.find((x: string) => x === 'ROLE_SUPERUSER')
+      if (superuser !== undefined) {
+        this.deleteAllowed = true
+      }
+    }
   }
 })
 </script>

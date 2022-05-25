@@ -8,7 +8,7 @@
       nav
     >
       <v-list-item
-        v-for="item in items"
+        v-for="item in filteredList"
         :key="item.title"
         :to="item.route"
         link
@@ -27,6 +27,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import { mapGetters } from 'vuex'
 
 export default Vue.extend({
   name: 'CustomSideBar',
@@ -37,11 +38,32 @@ export default Vue.extend({
       { title: 'Systems', icon: 'mdi-web', route: '/systems' },
       { title: 'Calendar', icon: 'mdi-calendar-outline', route: '/calendar' },
       { title: 'Events', icon: 'mdi-alarm', route: '/events' },
-      { title: 'Reports', icon: 'mdi-chart-box-outline', route: '/reports' },
-      { title: 'User Profile', icon: 'mdi-account-outline', route: '/user' },
-      { title: 'Settings', icon: 'mdi-cog-outline', route: '/settings' },
+      { title: 'Reports', icon: 'mdi-chart-box-outline', route: '/reports', online: 'yes', restricted: 'yes' },
+      { title: 'User Profile', icon: 'mdi-account-outline', route: '/user', online: 'yes' },
+      { title: 'Settings', icon: 'mdi-cog-outline', route: '/settings', online: 'yes', restricted: 'yes' },
       { title: 'About', icon: 'mdi-application-brackets-outline', route: '/about' }
     ]
-  })
+  }),
+
+  computed: {
+    ...mapGetters({
+      isAuth: 'isAuthenticated',
+      getUser: 'getUserState'
+    }),
+
+    filteredList () {
+      if (this.isAuth > 0) {
+        const admin: string = this.getUser.roles.find((x: string) => x === 'ROLE_ADMIN')
+
+        if (admin === 'ROLE_ADMIN') {
+          return this.items
+        }
+
+        return this.items.filter((x: any) => x.restricted !== 'yes')
+      }
+
+      return this.items.filter((x: any) => x.online !== 'yes')
+    }
+  }
 })
 </script>

@@ -89,7 +89,7 @@ const actions = {
       const eventArr = result.data as Event[]
       eventArr.forEach((element: Event) => {
         commit('addEventToList', element)
-      });
+      })
     }).catch((error) => {
       console.log(error.response.data)
     })

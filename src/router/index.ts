@@ -1,5 +1,7 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
+import VueMeta from 'vue-meta'
+import store from '../store/index'
 
 import DashboardView from '../views/DashboardView.vue'
 import SystemsView from '../views/SystemsView.vue'
@@ -11,6 +13,10 @@ import SettingsView from '../views/SettingsView.vue'
 import AboutView from '../views/AboutView.vue'
 
 Vue.use(VueRouter)
+Vue.use(VueMeta)
+
+const isAuth = store.getters.isAuthenticated
+const user = store.getters.getUserState
 
 const routes: Array<RouteConfig> = [
   {
@@ -36,30 +42,52 @@ const routes: Array<RouteConfig> = [
   {
     path: '/reports',
     name: 'reports',
-    component: ReportsView
+    component: ReportsView,
+    beforeEnter: (to, from, next) => {
+      const admin = user.roles.find((x: string) => x === 'ROLE_ADMIN')
+      console.log(user.roles)
+      if (admin === undefined) {
+        next('/')
+      } else {
+        next()
+      }
+    }
   },
   {
     path: '/user',
     name: 'user',
-    component: UserProfileView
+    component: UserProfileView,
+    beforeEnter: (to, from, next) => {
+      if (!isAuth) {
+        next('/')
+      } else {
+        next()
+      }
+    }
   },
   {
     path: '/settings',
     name: 'settings',
-    component: SettingsView
+    component: SettingsView,
+    beforeEnter: (to, from, next) => {
+      const superuser = user.roles.find((x: string) => x === 'ROLE_SUPERUSER')
+      if (superuser === undefined) {
+        next('/')
+      } else {
+        next()
+      }
+    }
   },
   {
     path: '/about',
     name: 'about',
     component: AboutView
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    // component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
   }
 ]
 
 const router = new VueRouter({
+  // Uncomment to remove hashtag from app URL
+  // This needs tweaking on the server side to use properly
   // mode: 'history',
   base: process.env.BASE_URL,
   routes
