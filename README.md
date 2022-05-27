@@ -7,3 +7,6 @@ _The sources may be found under_
 src/main/resources/frontend
 ```
 _This repository is now deprecated. Thank you for the support. :)_ 
+
+_Love,_   
+_bossbuwi_
