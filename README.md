@@ -1,24 +1,9 @@
 # reality
 
-## Project setup
-```
-npm install
-```
+_**reality** has collided with **[existence](https://github.com/bossbuwi/existence)**_  
 
-### Compiles and hot-reloads for development
+_The sources may be found under_   
 ```
-npm run serve
+src/main/resources/frontend
 ```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+_This repository is now deprecated. Thank you for the support. :)_ 
